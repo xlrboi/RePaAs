@@ -8,8 +8,9 @@ from langchain_core.tools import InjectedToolCallId, tool
 from langgraph.prebuilt import InjectedState # This annotation enables tools to access graph state without exposing state management details to the language model.
 from langgraph.types import Command # Allow a tool to issue a command to modify the graph state during execution
 from folder.schemas.tools_Schema import WebSearchInput
-from folder.services.web_search import web_search as web_search_service
+from folder.services import web_search as web_search_service
 from langchain_core.documents import Document
+
 
 
 
