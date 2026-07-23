@@ -11,22 +11,24 @@ from folder.schemas.tools_Schema import WebSearchInput
 from folder.services import web_search as web_search_service
 from langchain_core.documents import Document
 
-
-
-
-
-
 @tool(args_schema=WebSearchInput)
 def web_search(
     optimized_query: str,
     max_results: int,
-    current_docs: Annotated[list, InjectedState("retrieved_docs")],
+    state: Annotated[dict, InjectedState],
     tool_call_id: Annotated[str, InjectedToolCallId],
-) -> list:
+) -> Command:
     """Search the web for current or supplementary information using Tavily."""
+    current_docs = state.get("retrieved_docs", [])
     results = web_search_service.search(optimized_query, max_results=max_results)
     if not results:
-        return [ToolMessage(content="No web results found.", tool_call_id=tool_call_id)]
+        return Command(
+            update={
+                "messages": [
+                    ToolMessage(content="No web results found.", tool_call_id=tool_call_id)
+                ]
+            }
+        )
     web_docs = [
         Document(
             page_content=r["content"],
@@ -35,7 +37,9 @@ def web_search(
         for r in results
     ]
     summary = f"Found {len(web_docs)} web result(s) for: {optimized_query}"
-    return [
-        ToolMessage(content=summary, tool_call_id=tool_call_id),
-        Command(update={"retrieved_docs": (current_docs or []) + web_docs}),
-    ]
+    return Command(
+        update={
+            "messages": [ToolMessage(content=summary, tool_call_id=tool_call_id)],
+            "retrieved_docs": (current_docs or []) + web_docs,
+        }
+    )

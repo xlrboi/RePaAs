@@ -26,6 +26,15 @@ def _route_query(state: RAGState) -> str:
 
 
 def _agent_routing(state: RAGState) -> str:
+    """
+    Determines the next node to execute based on the current state.
+    
+    Priority:
+    1. Execute pending tool calls first.
+    2. If no tool calls, check if max retrieval attempts reached.
+    3. If not at max attempts, check for relevancy.
+    4. Otherwise, proceed to generate answer.
+    """
     # Always execute pending tool calls first — shortcutting here would leave
     # an AIMessage with tool_calls unmatched by ToolMessages in the
     # checkpointer, corrupting history for all future turns in the session.

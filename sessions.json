@@ -1,0 +1,14 @@
+{
+  "54d70343-4e34-460f-ba8d-5038a4328b69": {
+    "id": "54d70343-4e34-460f-ba8d-5038a4328b69",
+    "name": "Current Paper in Memory",
+    "created_at": "2026-07-23T20:59:59.452775",
+    "is_named": true
+  },
+  "2b57e3a3-ac26-4470-9898-94ad77eddb98": {
+    "id": "2b57e3a3-ac26-4470-9898-94ad77eddb98",
+    "name": "Greeting Session",
+    "created_at": "2026-07-23T22:07:55.843642",
+    "is_named": true
+  }
+}

@@ -17,21 +17,28 @@ from folder.services import vector_store
 def retrieve_from_vectorstore(
     query: str,
     k: int,
-    session_id: Annotated[str, InjectedState("session_id")],
-    current_docs: Annotated[list, InjectedState("retrieved_docs")],
+    state: Annotated[dict, InjectedState],
     tool_call_id: Annotated[str, InjectedToolCallId],
-) -> list:
+) -> Command:
     """Search the uploaded research paper vector store for relevant passages."""
+    session_id = state.get("session_id", "default")
+    current_docs = state.get("retrieved_docs", [])
     docs = vector_store.search(query=query, session_id=session_id, k=k)
     if not docs:
-        return [
-            ToolMessage(
-                content="No relevant documents found in the vector store.",
-                tool_call_id=tool_call_id,
-            )
-        ]
+        return Command(
+            update={
+                "messages": [
+                    ToolMessage(
+                        content="No relevant documents found in the vector store.",
+                        tool_call_id=tool_call_id,
+                    )
+                ]
+            }
+        )
     summary = f"Retrieved {len(docs)} chunk(s) from the vector store."
-    return [
-        ToolMessage(content=summary, tool_call_id=tool_call_id),
-        Command(update={"retrieved_docs": (current_docs or []) + docs}),
-    ]
+    return Command(
+        update={
+            "messages": [ToolMessage(content=summary, tool_call_id=tool_call_id)],
+            "retrieved_docs": (current_docs or []) + docs,
+        }
+    )

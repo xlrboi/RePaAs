@@ -20,7 +20,9 @@ def _get_embeddings() -> CacheBackedEmbeddings:
     settings = get_settings()
     base_embeddings = AzureOpenAIEmbeddings(
         azure_deployment=settings.azure_openai_embedding_deployment,
-        azure_endpoint=settings.azure_openai_endpoint
+        azure_endpoint=settings.azure_openai_endpoint,
+        api_version=settings.azure_openai_api_version,
+        api_key=settings.azure_openai_api_key,
     )
     embedding_file_store = LocalFileStore(str(settings.embedding_cache_dir))
     return CacheBackedEmbeddings.from_bytes_store(
