@@ -10,5 +10,11 @@
     "name": "Greeting Session",
     "created_at": "2026-07-23T22:07:55.843642",
     "is_named": true
+  },
+  "3b489566-28df-4e4e-b76d-beb2cb0bcb2e": {
+    "id": "3b489566-28df-4e4e-b76d-beb2cb0bcb2e",
+    "name": "Paper Explanation",
+    "created_at": "2026-07-23T22:25:47.271664",
+    "is_named": true
   }
 }

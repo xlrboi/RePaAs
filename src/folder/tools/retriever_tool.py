@@ -8,17 +8,18 @@ from langchain_core.messages import ToolMessage
 from langchain_core.tools import InjectedToolCallId, tool
 from langgraph.prebuilt import InjectedState # This annotation enables tools to access graph state without exposing state management details to the language model.
 from langgraph.types import Command # Allow a tool to issue a command to modify the graph state during execution
+from folder.constants import DEFAULT_RETRIEVAL_K
 from folder.schemas.tools_Schema import RetrieverInput
 from folder.services import vector_store
 
 
 
-@tool(args_schema=RetrieverInput)
+@tool
 def retrieve_from_vectorstore(
     query: str,
-    k: int,
-    state: Annotated[dict, InjectedState],
-    tool_call_id: Annotated[str, InjectedToolCallId],
+    k: int = DEFAULT_RETRIEVAL_K,
+    state: Annotated[dict, InjectedState] = None,
+    tool_call_id: Annotated[str, InjectedToolCallId] = None,
 ) -> Command:
     """Search the uploaded research paper vector store for relevant passages."""
     session_id = state.get("session_id", "default")

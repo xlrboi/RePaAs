@@ -7,16 +7,17 @@ from langchain_core.messages import ToolMessage
 from langchain_core.tools import InjectedToolCallId, tool
 from langgraph.prebuilt import InjectedState # This annotation enables tools to access graph state without exposing state management details to the language model.
 from langgraph.types import Command # Allow a tool to issue a command to modify the graph state during execution
+from folder.constants import DEFAULT_WEB_RESULTS
 from folder.schemas.tools_Schema import WebSearchInput
 from folder.services import web_search as web_search_service
 from langchain_core.documents import Document
 
-@tool(args_schema=WebSearchInput)
+@tool
 def web_search(
     optimized_query: str,
-    max_results: int,
-    state: Annotated[dict, InjectedState],
-    tool_call_id: Annotated[str, InjectedToolCallId],
+    max_results: int = DEFAULT_WEB_RESULTS,
+    state: Annotated[dict, InjectedState] = None,
+    tool_call_id: Annotated[str, InjectedToolCallId] = None,
 ) -> Command:
     """Search the web for current or supplementary information using Tavily."""
     current_docs = state.get("retrieved_docs", [])

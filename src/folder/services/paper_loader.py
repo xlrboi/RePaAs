@@ -42,13 +42,22 @@ def load_markdown(file_path: str) -> list[Document]:
 
 
 def load_webpage(url: str) -> list[Document]:
-    docs = WebBaseLoader(url, requests_kwargs={"timeout": 30}).load()
-    title = (docs[0].metadata.get("title") or url) if docs else url
-    return _stamp_title(_splitter.split_documents(docs), title)
+    try:
+        docs = WebBaseLoader(url, requests_kwargs={"timeout": 30}).load()
+        if not docs:
+            raise ValueError(f"No content loaded from URL: {url}")
+        title = (docs[0].metadata.get("title") or url) if docs else url
+        return _stamp_title(_splitter.split_documents(docs), title)
+    except Exception as e:
+        raise ValueError(f"Failed to load webpage {url}: {str(e)}")
 
 
 def _load_arxiv_by_id(arxiv_id: str) -> list[Document]:
-    tmp_path = arxiv_client.download_pdf(arxiv_id)
+    try:
+        tmp_path = arxiv_client.download_pdf(arxiv_id)
+    except Exception as e:
+        raise ValueError(f"Failed to download PDF for ArXiv ID {arxiv_id}: {str(e)}")
+    
     try:
         docs = PyMuPDFLoader(str(tmp_path)).load()
         if not docs:
@@ -57,12 +66,17 @@ def _load_arxiv_by_id(arxiv_id: str) -> list[Document]:
             arxiv_id
         )
         return _stamp_title(_splitter.split_documents(docs), title)
+    except Exception as e:
+        raise ValueError(f"Failed to process PDF for ArXiv ID {arxiv_id}: {str(e)}")
     finally:
         tmp_path.unlink(missing_ok=True)
 
 
 def load_arxiv(query: str) -> list[Document]:
-    arxiv_id = arxiv_client.resolve_arxiv_id(query)
+    try:
+        arxiv_id = arxiv_client.resolve_arxiv_id(query)
+    except Exception as e:
+        raise ValueError(f"Failed to resolve ArXiv query '{query}': {str(e)}")
     return _load_arxiv_by_id(arxiv_id)
 
 
