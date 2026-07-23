@@ -27,4 +27,15 @@ def get_utility_llm() -> AzureChatOpenAI:
         azure_endpoint=settings.azure_openai_endpoint,
         api_version=settings.azure_openai_api_version,
         api_key=settings.azure_openai_api_key,
-    )
+    )
+
+@lru_cache
+def get_golden_llm() -> AzureChatOpenAI:
+    """Model for generating goldens."""
+    settings = get_settings()
+    return AzureChatOpenAI(
+        azure_deployment=settings.azure_openai_chat_deployment,
+        azure_endpoint=settings.azure_openai_endpoint,
+        api_version=settings.azure_openai_api_version,
+        api_key=settings.azure_openai_api_key,
+    )

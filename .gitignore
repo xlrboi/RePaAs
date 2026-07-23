@@ -222,3 +222,5 @@ checkpoints.db-Shm
 checkpoints.db-wal
 checkpoints.db
 embedding_cache/
+eval_checkpoints.db
+eval_err.txt

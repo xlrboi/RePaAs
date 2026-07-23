@@ -1,0 +1,42 @@
+[
+  {
+    "input": "How does the weighted quantile sketch support efficient approximate quantile queries on weighted data?",
+    "expected_output": "It supports efficient approximate quantile queries by maintaining a **weighted quantile summary** with three key functions: \\( \\tilde r^+_D \\), \\( \\tilde r^-_D \\), and \\( \\tilde \\omega_D \\).  \n\nThis summary:\n- works on **weighted data**,\n- can be **merged** with another summary while keeping error at \\( \\max(\\epsilon_1,\\epsilon_2) \\),\n- can be **pruned** while controlling error increase,\n- and allows a query function \\( g(Q,d) \\) to return an approximate point for a target rank \\( d \\).\n\nThis makes it suitable for **streaming and distributed quantile computation**, while still handling weights efficiently."
+  },
+  {
+    "input": "Imagine distributed weighted data; how do merge/prune preserve ε-approx quantile accuracy?",
+    "expected_output": "Merge combines the summaries by adding their rank bounds and weights pointwise, and the merged summary keeps accuracy **max(ε1, ε2)**. This works because the rank errors are additive and still bounded by the total weight.\n\nPrune reduces the summary size to **b+1** while increasing the error from **ε** to **ε + 1/b**. So it trades a small loss in accuracy for a smaller summary.\n\nOverall, these operations preserve approximate quantile accuracy and make the weighted summary suitable for distributed and streaming settings."
+  },
+  {
+    "input": "Imagine local proposals re-bin after each split; how are candidate split points chosen?",
+    "expected_output": "With local proposals, candidate split points are re-proposed after each split, using percentiles of the feature distribution in the current node. This re-bins the data at each level, so the split candidates are refined as the tree grows."
+  },
+  {
+    "input": "How do global vs local proposal methods differ in split-point refinement and candidate count?",
+    "expected_output": "Global proposal generates all split candidates once at the start and reuses them at every tree level, so it needs fewer proposal steps but usually more candidates. Local proposal regenerates candidates after each split, refining split points as the tree grows, so it can work with fewer candidates."
+  },
+  {
+    "input": "How does the block structure enable both presorted split scanning and reusable out-of-core storage?",
+    "expected_output": "The block structure stores data in compressed column format, with each column already sorted by feature value. This lets split candidates be found by a single linear scan instead of repeated sorting. The same block layout is computed once and reused across training iterations, and it also supports out-of-core storage by splitting data into blocks on disk, then prefetching and decompressing them during training."
+  },
+  {
+    "input": "How does sparsity-aware split finding visit non-missing entries and improve time complexity?",
+    "expected_output": "Sparsity-aware split finding only scans the non-missing entries \\(I_k\\) for each feature, rather than all instances. It sorts these entries by feature value and enumerates split points in both directions, treating missing values as going left or right to find the best default direction. This makes computation linear in the number of non-missing entries, instead of depending on the full data size, and can be much faster on sparse data."
+  },
+  {
+    "input": "Which 4 datasets were used, and which were single-machine vs distributed/out-of-core?",
+    "expected_output": "The 4 datasets were:\n\n- **Allstate** — used for **single-machine** experiments\n- **Higgs Boson** — used for **single-machine** experiments\n- **Yahoo LTRC** — used for **single-machine** experiments\n- **Criteo** — used for **distributed** and **out-of-core** experiments\n\nSo, the **first three** were for **single-machine parallel** settings, and **Criteo** was for **distributed/out-of-core** settings."
+  },
+  {
+    "input": "How were Allstate, Higgs, Yahoo LTRC, and Criteo used to test XGBoost’s scaling and accuracy?",
+    "expected_output": "Allstate and Higgs were used in single-machine classification tests, with 10M training examples each; Allstate evaluated sparsity-aware performance, and Higgs was used to compare XGBoost’s exact greedy method against other tree boosters. Yahoo LTRC was used for learning-to-rank evaluation against pGBRT. Criteo was used for out-of-core and distributed scaling experiments, using 1.7 billion preprocessed instances to test XGBoost’s ability to handle very large data efficiently."
+  },
+  {
+    "input": "How does XGBoost combine sparsity-aware learning, weighted quantile sketch, and systems optimizations?",
+    "expected_output": "XGBoost combines them by using:\n\n- a **novel sparsity-aware algorithm** to efficiently handle sparse data,\n- a **weighted quantile sketch** for approximate tree learning that supports instance weights,\n- and **systems optimizations** like better cache access patterns, data compression, sharding, parallel/distributed computation, and out-of-core processing.\n\nTogether, these let XGBoost scale to **billions of examples** while using far fewer resources than existing systems."
+  },
+  {
+    "input": "Compare XGBoost with existing tree boosting systems: what scalability features differ?",
+    "expected_output": "XGBoost differs from existing tree boosting systems by adding several scalability-focused features:\n\n- **Novel sparsity-aware algorithm** for handling sparse data efficiently.\n- **Weighted quantile sketch** for approximate tree learning with instance weights.\n- **Cache-aware optimization**, improving cache access patterns.\n- **Data compression and sharding** to reduce memory and improve distributed processing.\n- **Out-of-core computation**, allowing it to scale beyond memory limits.\n- **Parallel and distributed computing**, making training faster and more scalable.\n\nTogether, these let XGBoost run **over 10× faster on a single machine** and scale to **billions of examples** using fewer resources than prior systems."
+  }
+]
